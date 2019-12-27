@@ -15,6 +15,7 @@ module Parser
 , oneOf
 , ws
 , Json (..)
+, times
 )
 where
 
@@ -167,3 +168,8 @@ integer = unsignedInteger <|> negativeInteger
             negativeInteger = (*) (-1) <$> (char '-' *> unsignedInteger)
 
 
+times :: Int -> Parser a -> Parser [a]
+times n p
+  | n < 0 = error "Cannot parse negative instances of a token"
+  | n == 0 = pure []
+  | otherwise = liftA2 (:) p (times (n-1) p)
