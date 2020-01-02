@@ -6,6 +6,7 @@ module Parser
 , char
 , string
 , integer
+, float
 , oneOf
 , ws
 , times
@@ -104,3 +105,12 @@ times n p
   | n < 0 = error "Cannot parse negative instances of a token"
   | n == 0 = pure []
   | otherwise = liftA2 (:) p (times (n-1) p)
+
+dig :: Parser Char
+dig = oneOf $ map char ['0'..'9']
+
+float :: Parser Float
+float = ufloat <|> negfloat <|> (fromIntegral <$> integer)
+  where
+    ufloat = read <$> ((\x y z -> x ++ [y] ++ z) <$> (some dig) <*> (char '.') <*> (some dig))
+    negfloat = (*) (-1) <$> (char '-' *> ufloat)
