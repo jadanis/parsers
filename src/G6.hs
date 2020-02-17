@@ -37,12 +37,12 @@ toMatrix' tup s =
     (b:bs) | b == '0' -> toMatrix' (enum' tup) bs
     _ -> error "Unexpected bit in bitstring"
 
-adj_matrix :: Int -> Parser (Int,[(Int,Int)])
-adj_matrix n = ((\x -> (n,x)) . toMatrix . reverse . (drop dm) . reverse . concat ) <$> (m `times` bitvec)
+adj_matrix :: Int -> Parser G6
+adj_matrix n = ((Graph n) . toMatrix . reverse . (drop dm) . reverse . concat ) <$> (m `times` bitvec)
   where
     bin_n = n*(n-1) `div` 2
-    m = (bin_n `div` 6) + (if m' == 0 then 0 else 1)
     m' = bin_n `mod` 6
+    m = (bin_n `div` 6) + (if m' == 0 then 0 else 1)
     dm = if m' == 0 then 0 else (6 - m')
 
 g6 :: Parser G6
@@ -51,7 +51,7 @@ g6 :: Parser G6
   (mat,input'') <- parse (adj_matrix n) input'
   return (Graph n mat, input'')
 -}
-g6 = (\(n,m) -> Graph n m) <$> (order >>= adj_matrix)
+g6 = order >>= adj_matrix
 
 main :: IO ()
 main = do
