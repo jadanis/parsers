@@ -41,17 +41,29 @@ data HexCom
   | CopyMP -- &
   deriving (Read,Show,Eq)
 
+hexcom :: Parser HexCom
+hexcom = oneOf opList
+
+opList :: [Parser HexCom]
+opList = (map shiftInt [0..9]) ++ opList'
+
+opList' :: [Parser HexCom]
+opList' = zipWith op [NoOp, Terminate, Inc, Dec, Sum, Diff, Prod, Quot, Mod, Neg, ByteRead, IntRead, ByteOut, IntOut, Jump, NSMirr, WEMirr, DMirr, D'Mirr, LBranch, RBranch, DecIP, IncIP, ModIP, LMP,RMP, BLMP, BRMP, RevMP, BranchMP, CopyMP] ['.','@',')','(','+','-','*',':','%','~',',','?',';','!','$','_','|','/','\\','<','>','[',']','#','{','}','"','\'', '=', '^','&']
+
 op :: HexCom -> Char -> Parser HexCom
 op hx c = (const hx) <$> (char c)
 
 shiftInt :: Int -> Parser HexCom
 shiftInt n = op (Shift n) (head $ show n)
 
-opList' :: [Parser HexCom]
-opList' = zipWith op [NoOp, Terminate, Inc, Dec, Sum, Diff, Prod, Quot, Mod, Neg, ByteRead, IntRead, ByteOut, IntOut, Jump, NSMirr, WEMirr, DMirr, D'Mirr, LBranch, RBranch, DecIP, IncIP, ModIP, LMP,RMP, BLMP, BRMP, RevMP, BranchMP, CopyMP] ['.','@',')','(','+','-','*',':','%','~',',','?',';','!','$','_','|','/','\\','<','>','[',']','#','{','}','"','\'', '=', '^','&']
+hexNum :: Int -> Int
+hexNum n = 3*n**2 + 3*n + 1
 
-opList :: [Parser HexCom]
-opList = (map shiftInt [0..9]) ++ opList'
+sL :: Parser (Int,String)
+sL = (\s -> (length s, s)) <$> (many anyChar)
 
-hexcom :: Parser HexCom
-hexcom = oneOf opList
+
+
+
+
+
