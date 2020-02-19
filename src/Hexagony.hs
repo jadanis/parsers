@@ -57,7 +57,23 @@ shiftInt :: Int -> Parser HexCom
 shiftInt n = op (Shift n) (head $ show n)
 
 hexNum :: Int -> Int
-hexNum n = 3*n**2 + 3*n + 1
+hexNum n = 3*m^2 + 3*m + 1
+  where
+    n' = fromIntegral n
+    n'' = 4*n' - 1
+    sqN = sqrt (n'' / 3)
+    m = ceiling $ (sqN - 1) / 2
+
+hexCorrect :: String -> String
+hexCorrect s
+  | l < h = s ++ (replicate (h - l) '.')
+  | otherwise = s
+  where
+    l = length s
+    h = hexNum l
+
+hexString :: Parser String
+hexString = (hexCorrect . (filter (not . isSpace))) <$> (many anyChar)
 
 sL :: Parser (Int,String)
 sL = (\s -> (length s, s)) <$> (many anyChar)
