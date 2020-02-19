@@ -1,10 +1,11 @@
 module Hexagony
-(
+( hexString
 )
 where
 
 import Parser
 import Control.Applicative ((<|>),many)
+import Data.Char (isSpace)
 
 data HexCom
   = NoOp -- .
@@ -72,14 +73,31 @@ hexCorrect s
     l = length s
     h = hexNum l
 
+sqr :: Int -> Int
+sqr = sqr' 0
+
+sqr' :: Int -> Int -> Int 
+sqr' m n = if n > m^2 then (sqr' (m+1) n) else m
+
+invHex :: Int -> Int
+invHex n = (n' - 1) `div` 2
+  where
+    sN = (4*n - 1) `div` 3
+    n' = sqr sN
+
+partHex :: String -> [String]
+partHex s = partHex' (hexPartition $ (+) 1 $ invHex $ length s)
+
+partHex' :: [Int] -> String -> String
+partHex' _ "" = []
+partHex' (n:ns) s = (take n s):(partHex' ns (drop n s))
+
+hexPartition :: Int -> [Int]
+hexPartition n = ls' ++ [2*n - 1] ++ (reverse ls')
+  where
+    ls' = [n..(2*n - 2)]
+
 hexString :: Parser String
 hexString = (hexCorrect . (filter (not . isSpace))) <$> (many anyChar)
 
-sL :: Parser (Int,String)
-sL = (\s -> (length s, s)) <$> (many anyChar)
-
-
-
-
-
-
+type HexProgram = [[HexCom]]
