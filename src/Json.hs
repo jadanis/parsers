@@ -25,19 +25,13 @@ data Json
     deriving (Show, Eq)
 
 jsTrue :: Parser Json
-jsTrue = Parser $ \text -> do
-    (_, rest) <- parse (string "true") text
-    pure (JsBool True,rest)
+jsTrue = (const (JsBool True)) <$> (string "true")
 
 jsFalse :: Parser Json
-jsFalse = Parser $ \text -> do
-    (_, rest) <- parse (string "false") text
-    pure (JsBool False,rest)
+jsFalse = (const (JsBool False)) <$> (string "false")
 
 jsNull :: Parser Json    
-jsNull = Parser $ \text -> do
-    (_, rest) <- parse (string "null") text
-    pure (JsNull,rest)
+jsNull = (const JsNull) <$> (string "null")
 
 jsString :: Parser Json
 jsString = JsString <$> between (many character) (char '"') (char '"')
