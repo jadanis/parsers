@@ -46,10 +46,10 @@ instance Monad Parser where
     p >>= f = join $ f <$> p
 
 unless :: Parser a -> (a -> Bool) -> Parser a
-unless p pred = Parser $ \text -> do
-    (v, rest) <- parse p text
+unless p pred = do
+    v <- p
     guard $ not $ pred v
-    pure (v,rest)
+    return v
 
 anyChar :: Parser Char
 anyChar = Parser $ \case
@@ -82,11 +82,10 @@ manySepBy p delim = do
         (Nothing,Nothing) -> pure []
 
 string :: String -> Parser String
-string [] = Parser $ \text -> Just ("",text)
-string (c:cs) = Parser $ \text -> do
-    (_, rest) <- parse (char c) text
-    (_, rest') <- parse (string cs) rest
-    pure (c:cs, rest')
+string [] = pure ""
+string (c:cs) = do
+    char c
+    string cs
                 
 digit :: Parser Integer
 digit = oneOf $ (\(v,c) -> const v <$> char c) <$> zip [0..] ['0'..'9']
