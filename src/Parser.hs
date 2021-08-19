@@ -86,6 +86,7 @@ string [] = pure ""
 string (c:cs) = do
     char c
     string cs
+    return (c:cs)
                 
 digit :: Parser Integer
 digit = oneOf $ (\(v,c) -> const v <$> char c) <$> zip [0..] ['0'..'9']
